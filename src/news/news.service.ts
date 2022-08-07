@@ -32,7 +32,7 @@ export class NewsService {
             text: createNewsDto.text,
             date: new Date().toUTCString(),
         };
-        // this.news.push(news);
+        this.news.push(news);
     }
 
     findAll() {
