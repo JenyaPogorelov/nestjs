@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import {CreateCommentDto} from "./dto/create-comment.dto";
 
 @Controller('news')
 export class NewsController {
@@ -10,6 +11,11 @@ export class NewsController {
   @Post()
   create(@Body() createNewsDto: CreateNewsDto) {
     return this.newsService.create(createNewsDto);
+  }
+
+  @Post("comment")
+  createComment(@Body() createCommentDto: CreateCommentDto) {
+    return this.newsService.createComment(createCommentDto);
   }
 
   @Get()

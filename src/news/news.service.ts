@@ -2,6 +2,8 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {CreateNewsDto} from './dto/create-news.dto';
 import {UpdateNewsDto} from './dto/update-news.dto';
 import {News} from './entities/news.entity';
+import {CreateCommentDto} from "./dto/create-comment.dto";
+import {Comment} from "./entities/comment.entity";
 
 @Injectable()
 export class NewsService {
@@ -12,6 +14,14 @@ export class NewsService {
             author: "Jenya",
             title: "title",
             text: "text",
+            comments: [
+                {
+                    newsId: 1,
+                    author: "Jenya",
+                    text: "text",
+                    date: "2022-08-04T17:59:30.132Z"
+                }
+            ],
             date: "2022-08-04T17:57:30.132Z"
         },
         {
@@ -19,6 +29,7 @@ export class NewsService {
             author: "Jenya",
             title: "title2",
             text: "text2",
+            comments: [],
             date: "2022-08-04T17:57:30.132Z"
         }
     ];
@@ -30,9 +41,24 @@ export class NewsService {
             author: "Jenya",
             title: createNewsDto.title,
             text: createNewsDto.text,
+            comments: [],
             date: new Date().toUTCString(),
         };
         this.news.push(news);
+    }
+
+    createComment(createCommentDto: CreateCommentDto) {
+        const newsId = createCommentDto.newsId;
+        const news = this.findOne(newsId);
+
+        const comment: Comment = {
+            // ...createNewsDto,
+            newsId: news.comments.length + 1,
+            author: "Jenya",
+            text: createCommentDto.text,
+            date: new Date().toUTCString(),
+        };
+        this.news[newsId - 1].comments.push(comment);
     }
 
     findAll() {
