@@ -16,7 +16,7 @@ export class NewsService {
             text: "text",
             comments: [
                 {
-                    newsId: 1,
+                    Id: 1,
                     author: "Jenya",
                     text: "text",
                     date: "2022-08-04T17:59:30.132Z"
@@ -53,7 +53,7 @@ export class NewsService {
 
         const comment: Comment = {
             // ...createNewsDto,
-            newsId: news.comments.length + 1,
+            Id: news.comments.length + 1,
             author: "Jenya",
             text: createCommentDto.text,
             date: new Date().toUTCString(),
@@ -76,7 +76,13 @@ export class NewsService {
     }
 
     update(id: number, updateNewsDto: UpdateNewsDto) {
-        return `This action updates a #${id} news`;
+        const news = this.news.find((news) => news.id === id);
+
+        if (!news) {
+            throw new NotFoundException();
+        }
+
+        this.news[id - 1].text = updateNewsDto.text;
     }
 
     remove(id: number) {
