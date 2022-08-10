@@ -20,6 +20,7 @@ export class NewsService {
                     id: 1,
                     author: "Jenya",
                     text: "text",
+                    comments: [],
                     date: "2022-08-04T17:59:30.132Z"
                 }
             ],
@@ -57,9 +58,33 @@ export class NewsService {
             id: news.comments.length + 1,
             author: "Jenya",
             text: createCommentDto.text,
+            comments: [],
             date: new Date().toUTCString(),
         };
         this.news[newsId - 1].comments.push(comment);
+    }
+
+    /**
+     * Создать комментарий к коментарию
+     * @param {number} id Номер коментария который надо прокоментировать
+     * @param {CreateCommentDto} createCommentDto Тело коментария
+     */
+    createCommentToComment(id: number, createCommentDto: CreateCommentDto) {
+        const newsId = createCommentDto.newsId
+        const newsComment = this.findOne(newsId).comments.find((comment) => comment.id === id);
+        if (!newsComment) {
+            throw new NotFoundException();
+        }
+
+        const comment: Comment = {
+            // ...createNewsDto,
+            id: newsComment.comments.length + 1,
+            author: "Jenya",
+            text: createCommentDto.text,
+            comments: [],
+            date: new Date().toUTCString(),
+        };
+        this.news[newsId - 1].comments[id - 1].comments.push(comment);
     }
 
     findAll() {

@@ -1,51 +1,57 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { NewsService } from './news.service';
-import { CreateNewsDto } from './dto/create-news.dto';
-import { UpdateNewsDto } from './dto/update-news.dto';
+import {Controller, Get, Post, Body, Patch, Param, Delete} from '@nestjs/common';
+import {NewsService} from './news.service';
+import {CreateNewsDto} from './dto/create-news.dto';
+import {UpdateNewsDto} from './dto/update-news.dto';
 import {CreateCommentDto} from "./dto/create-comment.dto";
 import {UpdateCommentDto} from "./dto/update-comment.dto";
 
 @Controller('news')
 export class NewsController {
-  constructor(private readonly newsService: NewsService) {}
+    constructor(private readonly newsService: NewsService) {
+    }
 
-  @Post()
-  create(@Body() createNewsDto: CreateNewsDto) {
-    return this.newsService.create(createNewsDto);
-  }
+    @Post()
+    create(@Body() createNewsDto: CreateNewsDto) {
+        return this.newsService.create(createNewsDto);
+    }
 
-  @Post("comment")
-  createComment(@Body() createCommentDto: CreateCommentDto) {
-    return this.newsService.createComment(createCommentDto);
-  }
+    @Post("comment")
+    createComment(@Body() createCommentDto: CreateCommentDto) {
+        return this.newsService.createComment(createCommentDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.newsService.findAll();
-  }
+    @Post("/comment/:id")
+    createCommentToComment(@Param('id') id: string, @Body() createCommentDto: CreateCommentDto) {
+        return this.newsService.createCommentToComment(+id, createCommentDto);
+    }
 
-  @Get('pop')
-  findPop() {
-    return this.newsService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.newsService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.newsService.findOne(+id);
-  }
+    @Get('pop')
+    findPop() {
+        return this.newsService.findAll();
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
-    return this.newsService.update(+id, updateNewsDto);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.newsService.findOne(+id);
+    }
 
-  @Patch('/comment/:id')
-  updateComment(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.newsService.updateComment(+id, updateCommentDto);
-  }
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
+        return this.newsService.update(+id, updateNewsDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.newsService.remove(+id);
-  }
+    @Patch('/comment/:id')
+    updateComment(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
+        return this.newsService.updateComment(+id, updateCommentDto);
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.newsService.remove(+id);
+    }
 }
