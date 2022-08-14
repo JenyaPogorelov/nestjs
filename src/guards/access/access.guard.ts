@@ -7,8 +7,11 @@ export class AccessGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(
-    context: ExecutionContext,
+      context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    return this.reflector.get("type", context.getHandler()) == "public";
+    const roles = this.reflector.get<string[]>('role', context.getHandler());
+    console.log(roles);
+    //Т.к. пока нету ролей возвращаю true
+    return true;
   }
 }

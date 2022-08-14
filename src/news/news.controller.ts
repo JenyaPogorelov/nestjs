@@ -13,55 +13,55 @@ export class NewsController {
     }
 
     @Post()
-    @Admin()
+    @Admin("Admin")
     create(@Body() createNewsDto: CreateNewsDto) {
         return this.newsService.create(createNewsDto);
     }
 
     @Post("comment")
-    @Public()
+    @Public("User")
     createComment(@Body() createCommentDto: CreateCommentDto) {
         return this.newsService.createComment(createCommentDto);
     }
 
     @Post("/comment/:id")
-    @Public()
+    @Public("User")
     createCommentToComment(@Param('id') id: string, @Body() createCommentDto: CreateCommentDto) {
         return this.newsService.createCommentToComment(+id, createCommentDto);
     }
 
     @Get()
-    @Public()
+    @Public("User")
     findAll() {
         return this.newsService.findAll();
     }
 
     @Get('pop')
-    @Public()
+    @Public("User")
     findPop() {
         return this.newsService.findAll();
     }
 
     @Get(':id')
-    @Public()
+    @Public("User")
     findOne(@Param('id') id: string) {
         return this.newsService.findOne(+id);
     }
 
     @Patch(':id')
-    @Public()
+    @Public("User")
     update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
         return this.newsService.update(+id, updateNewsDto);
     }
 
     @Patch('/comment/:id')
-    @Public()
+    @Public("User")
     updateComment(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
         return this.newsService.updateComment(+id, updateCommentDto);
     }
 
     @Delete(':id')
-    @Public()
+    @Public("User")
     remove(@Param('id') id: string) {
         return this.newsService.remove(+id);
     }

@@ -14,10 +14,6 @@ import {AccessGuard} from "./guards/access/access.guard";
             provide: APP_GUARD,
             useClass: AccessGuard,
         },
-        {
-            provide: APP_GUARD,
-            useClass: AccessGuard,
-        },
     ],
 })
 export class AppModule {
