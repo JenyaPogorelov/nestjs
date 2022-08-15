@@ -1,45 +1,68 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { NewsService } from './news.service';
-import { CreateNewsDto } from './dto/create-news.dto';
-import { UpdateNewsDto } from './dto/update-news.dto';
+import {Controller, Get, Post, Body, Patch, Param, Delete} from '@nestjs/common';
+import {NewsService} from './news.service';
+import {CreateNewsDto} from './dto/create-news.dto';
+import {UpdateNewsDto} from './dto/update-news.dto';
 import {CreateCommentDto} from "./dto/create-comment.dto";
+import {UpdateCommentDto} from "./dto/update-comment.dto";
+import {Public} from "../decorators/public.decorator";
+import {Admin} from "../decorators/admin.decorator";
 
 @Controller('news')
 export class NewsController {
-  constructor(private readonly newsService: NewsService) {}
+    constructor(private readonly newsService: NewsService) {
+    }
 
-  @Post()
-  create(@Body() createNewsDto: CreateNewsDto) {
-    return this.newsService.create(createNewsDto);
-  }
+    @Post()
+    @Admin("Admin")
+    create(@Body() createNewsDto: CreateNewsDto) {
+        return this.newsService.create(createNewsDto);
+    }
 
-  @Post("comment")
-  createComment(@Body() createCommentDto: CreateCommentDto) {
-    return this.newsService.createComment(createCommentDto);
-  }
+    @Post("comment")
+    @Public("User")
+    createComment(@Body() createCommentDto: CreateCommentDto) {
+        return this.newsService.createComment(createCommentDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.newsService.findAll();
-  }
+    @Post("/comment/:id")
+    @Public("User")
+    createCommentToComment(@Param('id') id: string, @Body() createCommentDto: CreateCommentDto) {
+        return this.newsService.createCommentToComment(+id, createCommentDto);
+    }
 
-  @Get('pop')
-  findPop() {
-    return this.newsService.findAll();
-  }
+    @Get()
+    @Public("User")
+    findAll() {
+        return this.newsService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.newsService.findOne(+id);
-  }
+    @Get('pop')
+    @Public("User")
+    findPop() {
+        return this.newsService.findAll();
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
-    return this.newsService.update(+id, updateNewsDto);
-  }
+    @Get(':id')
+    @Public("User")
+    findOne(@Param('id') id: string) {
+        return this.newsService.findOne(+id);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.newsService.remove(+id);
-  }
+    @Patch(':id')
+    @Public("User")
+    update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
+        return this.newsService.update(+id, updateNewsDto);
+    }
+
+    @Patch('/comment/:id')
+    @Public("User")
+    updateComment(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
+        return this.newsService.updateComment(+id, updateCommentDto);
+    }
+
+    @Delete(':id')
+    @Public("User")
+    remove(@Param('id') id: string) {
+        return this.newsService.remove(+id);
+    }
 }

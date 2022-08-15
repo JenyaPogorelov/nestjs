@@ -4,6 +4,7 @@ import {UpdateNewsDto} from './dto/update-news.dto';
 import {News} from './entities/news.entity';
 import {CreateCommentDto} from "./dto/create-comment.dto";
 import {Comment} from "./entities/comment.entity";
+import {UpdateCommentDto} from "./dto/update-comment.dto";
 
 @Injectable()
 export class NewsService {
@@ -16,9 +17,10 @@ export class NewsService {
             text: "text",
             comments: [
                 {
-                    newsId: 1,
+                    id: 1,
                     author: "Jenya",
                     text: "text",
+                    comments: [],
                     date: "2022-08-04T17:59:30.132Z"
                 }
             ],
@@ -53,12 +55,36 @@ export class NewsService {
 
         const comment: Comment = {
             // ...createNewsDto,
-            newsId: news.comments.length + 1,
+            id: news.comments.length + 1,
             author: "Jenya",
             text: createCommentDto.text,
+            comments: [],
             date: new Date().toUTCString(),
         };
         this.news[newsId - 1].comments.push(comment);
+    }
+
+    /**
+     * Создать комментарий к коментарию
+     * @param {number} id Номер коментария который надо прокоментировать
+     * @param {CreateCommentDto} createCommentDto Тело коментария
+     */
+    createCommentToComment(id: number, createCommentDto: CreateCommentDto) {
+        const newsId = createCommentDto.newsId
+        const newsComment = this.findOne(newsId).comments.find((comment) => comment.id === id);
+        if (!newsComment) {
+            throw new NotFoundException();
+        }
+
+        const comment: Comment = {
+            // ...createNewsDto,
+            id: newsComment.comments.length + 1,
+            author: "Jenya",
+            text: createCommentDto.text,
+            comments: [],
+            date: new Date().toUTCString(),
+        };
+        this.news[newsId - 1].comments[id - 1].comments.push(comment);
     }
 
     findAll() {
@@ -76,7 +102,23 @@ export class NewsService {
     }
 
     update(id: number, updateNewsDto: UpdateNewsDto) {
-        return `This action updates a #${id} news`;
+        const news = this.news.find((news) => news.id === id);
+
+        if (!news) {
+            throw new NotFoundException();
+        }
+
+        this.news[id - 1].text = updateNewsDto.text;
+    }
+
+    updateComment(id: number, updateCommentDto: UpdateCommentDto) {
+        const comment = this.news.find((news) => news.id === id).comments.find((comment) => comment.id === updateCommentDto.commentId);
+
+        if (!comment) {
+            throw new NotFoundException();
+        }
+
+        this.news[id - 1].comments[updateCommentDto.commentId - 1].text = updateCommentDto.text;
     }
 
     remove(id: number) {
