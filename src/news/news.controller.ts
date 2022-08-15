@@ -8,7 +8,7 @@ import {Public} from "../decorators/public.decorator";
 import {Admin} from "../decorators/admin.decorator";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {diskStorage} from 'multer';
-import { extname } from 'path';
+import {extname} from 'path';
 
 @Controller('news')
 export class NewsController {
@@ -29,7 +29,7 @@ export class NewsController {
         }),
     )
     create(@UploadedFile() file: Express.Multer.File, @Body() createNewsDto: CreateNewsDto) {
-        return this.newsService.create({...createNewsDto, thumbnail: file.path});
+        return this.newsService.create({...createNewsDto, thumbnail: `thumbnails/${file.filename}`});
     }
 
     @Post("comment")
