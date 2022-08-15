@@ -9,6 +9,7 @@ import {Admin} from "../decorators/admin.decorator";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {diskStorage} from 'multer';
 import {extname} from 'path';
+import {TimeoutInterceptor} from "../interseptors/timeuot/timeout.interceptor";
 
 @Controller('news')
 export class NewsController {
@@ -28,20 +29,43 @@ export class NewsController {
             }),
         }),
     )
+    @UseInterceptors(TimeoutInterceptor)
     create(@UploadedFile() file: Express.Multer.File, @Body() createNewsDto: CreateNewsDto) {
         return this.newsService.create({...createNewsDto, thumbnail: `thumbnails/${file.filename}`});
     }
 
     @Post("comment")
     @Public("User")
-    createComment(@Body() createCommentDto: CreateCommentDto) {
-        return this.newsService.createComment(createCommentDto);
+    @UseInterceptors(FileInterceptor('file',
+        {
+            storage: diskStorage({
+                destination: './uploads/thumbnails_comments',
+                filename: (req, file, cb) => {
+                    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+                    cb(null, `${randomName}${extname(file.originalname)}`)
+                }
+            }),
+        }),
+    )
+    createComment(@UploadedFile() file: Express.Multer.File, @Body() createCommentDto: CreateCommentDto) {
+        return this.newsService.createComment({...createCommentDto, thumbnail_comments: `thumbnails_comments/${file.filename}`});
     }
 
     @Post("/comment/:id")
     @Public("User")
-    createCommentToComment(@Param('id') id: string, @Body() createCommentDto: CreateCommentDto) {
-        return this.newsService.createCommentToComment(+id, createCommentDto);
+    @UseInterceptors(FileInterceptor('file',
+        {
+            storage: diskStorage({
+                destination: './uploads/thumbnails_comments',
+                filename: (req, file, cb) => {
+                    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+                    cb(null, `${randomName}${extname(file.originalname)}`)
+                }
+            }),
+        }),
+    )
+    createCommentToComment(@UploadedFile() file: Express.Multer.File, @Param('id') id: string, @Body() createCommentDto: CreateCommentDto) {
+        return this.newsService.createCommentToComment(+id, {...createCommentDto, thumbnail_comments: `thumbnails_comments/${file.filename}`});
     }
 
     @Get()

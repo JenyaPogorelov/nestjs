@@ -1,10 +1,13 @@
-import {IsNumber, IsString, IsPositive} from "class-validator";
+import {IsNumber, IsString, IsPositive, MinLength, IsNumberString} from "class-validator";
 
 export class CreateCommentDto {
-    @IsNumber()
-    @IsPositive()
+
+    @IsNumberString()
     newsId: number;
 
     @IsString()
+    @MinLength(10)
     text: string;
+
+    thumbnail_comments: string;
 }

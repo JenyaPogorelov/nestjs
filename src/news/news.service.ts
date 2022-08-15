@@ -25,7 +25,7 @@ export class NewsService {
     }
 
     createComment(createCommentDto: CreateCommentDto) {
-        const newsId = createCommentDto.newsId;
+        const newsId = +createCommentDto.newsId;
         const news = this.findOne(newsId);
 
         const comment: Comment = {
@@ -35,6 +35,7 @@ export class NewsService {
             text: createCommentDto.text,
             comments: [],
             date: new Date().toUTCString(),
+            thumbnail_comments: createCommentDto.thumbnail_comments,
         };
         this.news[newsId - 1].comments.push(comment);
     }
@@ -45,7 +46,7 @@ export class NewsService {
      * @param {CreateCommentDto} createCommentDto Тело коментария
      */
     createCommentToComment(id: number, createCommentDto: CreateCommentDto) {
-        const newsId = createCommentDto.newsId
+        const newsId = +createCommentDto.newsId
         const newsComment = this.findOne(newsId).comments.find((comment) => comment.id === id);
         if (!newsComment) {
             throw new NotFoundException();
@@ -58,6 +59,7 @@ export class NewsService {
             text: createCommentDto.text,
             comments: [],
             date: new Date().toUTCString(),
+            thumbnail_comments: createCommentDto.thumbnail_comments,
         };
         this.news[newsId - 1].comments[id - 1].comments.push(comment);
     }
