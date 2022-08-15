@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile} from '@nestjs/common';
 import {NewsService} from './news.service';
 import {CreateNewsDto} from './dto/create-news.dto';
 import {UpdateNewsDto} from './dto/update-news.dto';
@@ -6,6 +6,9 @@ import {CreateCommentDto} from "./dto/create-comment.dto";
 import {UpdateCommentDto} from "./dto/update-comment.dto";
 import {Public} from "../decorators/public.decorator";
 import {Admin} from "../decorators/admin.decorator";
+import {FileInterceptor} from "@nestjs/platform-express";
+import {diskStorage} from 'multer';
+import { extname } from 'path';
 
 @Controller('news')
 export class NewsController {
@@ -14,8 +17,19 @@ export class NewsController {
 
     @Post()
     @Admin("Admin")
-    create(@Body() createNewsDto: CreateNewsDto) {
-        return this.newsService.create(createNewsDto);
+    @UseInterceptors(FileInterceptor('file',
+        {
+            storage: diskStorage({
+                destination: './uploads/thumbnails',
+                filename: (req, file, cb) => {
+                    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+                    cb(null, `${randomName}${extname(file.originalname)}`)
+                }
+            }),
+        }),
+    )
+    create(@UploadedFile() file: Express.Multer.File, @Body() createNewsDto: CreateNewsDto) {
+        return this.newsService.create({...createNewsDto, thumbnail: file.path});
     }
 
     @Post("comment")
