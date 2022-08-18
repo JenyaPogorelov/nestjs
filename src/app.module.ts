@@ -5,6 +5,8 @@ import {NewsModule} from './news/news.module';
 import {APP_GUARD} from "@nestjs/core";
 import {AccessGuard} from "./guards/access/access.guard";
 import {MulterModule} from "@nestjs/platform-express";
+import {diskStorage} from "multer";
+import {extname} from "path";
 
 @Module({
     imports: [NewsModule],

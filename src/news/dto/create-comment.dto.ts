@@ -9,5 +9,5 @@ export class CreateCommentDto {
     @MinLength(10)
     text: string;
 
-    thumbnail_comments: string;
+    thumbnail_comments: string[];
 }

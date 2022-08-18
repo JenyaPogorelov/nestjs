@@ -4,5 +4,5 @@ export class Comment {
     text: string;
     comments: Comment[];
     date: string;
-    thumbnail_comments: string;
+    thumbnail_comments: string[];
 }

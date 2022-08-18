@@ -1,4 +1,15 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile} from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    UseInterceptors,
+    UploadedFile,
+    UploadedFiles, MaxFileSizeValidator, ParseFilePipe, FileTypeValidator
+} from '@nestjs/common';
 import {NewsService} from './news.service';
 import {CreateNewsDto} from './dto/create-news.dto';
 import {UpdateNewsDto} from './dto/update-news.dto';
@@ -6,10 +17,11 @@ import {CreateCommentDto} from "./dto/create-comment.dto";
 import {UpdateCommentDto} from "./dto/update-comment.dto";
 import {Public} from "../decorators/public.decorator";
 import {Admin} from "../decorators/admin.decorator";
-import {FileInterceptor} from "@nestjs/platform-express";
+import {FileInterceptor, FilesInterceptor} from "@nestjs/platform-express";
 import {diskStorage} from 'multer';
 import {extname} from 'path';
 import {TimeoutInterceptor} from "../interseptors/timeuot/timeout.interceptor";
+import {throws} from "assert";
 
 @Controller('news')
 export class NewsController {
@@ -18,54 +30,67 @@ export class NewsController {
 
     @Post()
     @Admin("Admin")
-    @UseInterceptors(FileInterceptor('file',
-        {
-            storage: diskStorage({
-                destination: './uploads/thumbnails',
-                filename: (req, file, cb) => {
-                    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-                    cb(null, `${randomName}${extname(file.originalname)}`)
-                }
-            }),
-        }),
+    @UseInterceptors(FilesInterceptor('files', null,
+            {
+                storage: diskStorage({
+                    destination: './uploads/thumbnails',
+                    filename: (req, file, cb) => {
+                        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+                        cb(null, `${randomName}${extname(file.originalname)}`)
+                    },
+                }),
+            },
+        ),
     )
     @UseInterceptors(TimeoutInterceptor)
-    create(@UploadedFile() file: Express.Multer.File, @Body() createNewsDto: CreateNewsDto) {
-        return this.newsService.create({...createNewsDto, thumbnail: `thumbnails/${file.filename}`});
+    create(@UploadedFiles() files: Array<Express.Multer.File>, @Body() createNewsDto: CreateNewsDto) {
+        console.log(files);
+        return this.newsService.create({
+            ...createNewsDto,
+            thumbnail: files.map(arr => `thumbnails/${arr.filename}`)
+        });
     }
 
     @Post("comment")
     @Public("User")
-    @UseInterceptors(FileInterceptor('file',
-        {
-            storage: diskStorage({
-                destination: './uploads/thumbnails_comments',
-                filename: (req, file, cb) => {
-                    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-                    cb(null, `${randomName}${extname(file.originalname)}`)
-                }
-            }),
-        }),
+    @UseInterceptors(FilesInterceptor('files', null,
+            {
+                storage: diskStorage({
+                    destination: './uploads/thumbnails_comments',
+                    filename: (req, file, cb) => {
+                        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+                        cb(null, `${randomName}${extname(file.originalname)}`)
+                    }
+                }),
+            },
+        ),
     )
-    createComment(@UploadedFile() file: Express.Multer.File, @Body() createCommentDto: CreateCommentDto) {
-        return this.newsService.createComment({...createCommentDto, thumbnail_comments: `thumbnails_comments/${file.filename}`});
+    createComment(@UploadedFiles() files: Array<Express.Multer.File>, @Body() createCommentDto: CreateCommentDto) {
+        return this.newsService.createComment({
+            ...createCommentDto,
+            thumbnail_comments: files.map(arr => `thumbnails/${arr.filename}`)
+        });
     }
 
     @Post("/comment/:id")
     @Public("User")
-    @UseInterceptors(FileInterceptor('file',
-        {
-            storage: diskStorage({
-                destination: './uploads/thumbnails_comments',
-                filename: (req, file, cb) => {
-                    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-                    cb(null, `${randomName}${extname(file.originalname)}`)
-                }
-            }),
-        }),
+    @UseInterceptors(FilesInterceptor('files', null,
+            {
+                storage: diskStorage({
+                    destination: './uploads/thumbnails_comments',
+                    filename: (req, file, cb) => {
+                        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+                        cb(null, `${randomName}${extname(file.originalname)}`)
+                    }
+                }),
+            },
+        ),
     )
-    createCommentToComment(@UploadedFile() file: Express.Multer.File, @Param('id') id: string, @Body() createCommentDto: CreateCommentDto) {
-        return this.newsService.createCommentToComment(+id, {...createCommentDto, thumbnail_comments: `thumbnails_comments/${file.filename}`});
+    createCommentToComment(@UploadedFiles() files: Array<Express.Multer.File>, @Param('id') id: string, @Body() createCommentDto: CreateCommentDto) {
+        return this.newsService.createCommentToComment(+id, {
+            ...createCommentDto,
+            thumbnail_comments: files.map(arr => `thumbnails/${arr.filename}`)
+        });
     }
 
     @Get()
