@@ -8,7 +8,7 @@ import {
     Delete,
     UseInterceptors,
     UploadedFile,
-    UploadedFiles, MaxFileSizeValidator, ParseFilePipe, FileTypeValidator
+    UploadedFiles, MaxFileSizeValidator, ParseFilePipe, FileTypeValidator, Render
 } from '@nestjs/common';
 import {NewsService} from './news.service';
 import {CreateNewsDto} from './dto/create-news.dto';
@@ -44,7 +44,7 @@ export class NewsController {
     )
     @UseInterceptors(TimeoutInterceptor)
     create(@UploadedFiles() files: Array<Express.Multer.File>, @Body() createNewsDto: CreateNewsDto) {
-        console.log(files);
+        // console.log(files);
         return this.newsService.create({
             ...createNewsDto,
             thumbnail: files.map(arr => `thumbnails/${arr.filename}`)
@@ -95,8 +95,9 @@ export class NewsController {
 
     @Get()
     @Public("User")
+    @Render('news-list')
     findAll() {
-        return this.newsService.findAll();
+        return { news: this.newsService.findAll()};
     }
 
     @Get('pop')
